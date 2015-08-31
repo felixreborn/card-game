@@ -24,6 +24,9 @@ elements = []
 changes = []
 functions = []
 
+//lock same animations
+openFGatePlaying = false
+
 window.onload = function() {
 	canvas = document.getElementById("canvas");
 	canvas.removeEventListener("mouseup", elementClicked);
@@ -84,13 +87,17 @@ function elementClicked(event){
 }
 
 function openFGate(){
-	openFGateAnimation(1, 1);
+	if (!openFGatePlaying){
+		openFGatePlaying = true
+		openFGateAnimation(0, 1);
+	}
 }
 
 function openFGateAnimation(count, modifier){
-	if (count == 0){
+	if (count == 0 && modifier == -1){
 		//stop
 		drawFriendlyWall();
+		openFGatePlaying = false
 	}else{
 		drawFriendlyWall();
 		//newgate1
@@ -108,7 +115,7 @@ function openFGateAnimation(count, modifier){
 		newGate2.x = myBase.gate2.x + modifier
 		//oldvalue
 		oldX = myBase.gate2.x
-		oldGate = {x:oldX, y :myBase.gate1.y, w:myBase.gate1.w, h:myBase.gate1.h}
+		oldGate = {x:oldX, y :myBase.gate2.y, w:myBase.gate2.w, h:myBase.gate2.h}
 		//push changes and change base
 		changes.push({old:oldGate, new:newGate2})
 		myBase.gate2.x = myBase.gate2.x + modifier
