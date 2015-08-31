@@ -38,8 +38,6 @@ window.onload = function() {
 	canvas.height = 1000;
 	//set it to full screen
 	ctx = canvas.getContext("2d");
-	patternGateL = ctx.createPattern(gate1, 'no-repeat');
-	patternGateR = ctx.createPattern(gate2, 'no-repeat');
 	draw();
 	setInterval(start, 33); // 33 milliseconds = ~ 30 frames per sec
 };
@@ -53,12 +51,10 @@ function start() {
 function redraw(){
 	var i = 0;
 	while (i < changes.length){
-		if (changes[i].pattern != undefined){
-			ctx.fillStyle = changes[i].pattern;
-		}
 		ctx.clearRect(changes[i].old.x, changes[i].old.y, changes[i].old.w, changes[i].old.h);
-		ctx.fillRect(changes[i].new.x, changes[i].new.y, changes[i].new.w, changes[i].new.h);
-		ctx.fill();
+		//ctx.fillRect(changes[i].new.x, changes[i].new.y, changes[i].new.w, changes[i].new.h);
+		ctx.drawImage(changes[i].pattern, changes[i].new.x, changes[i].new.y);
+
 		changes.splice(i, 1);
 		ctx.fillStyle = "black";
 		i++;
@@ -117,7 +113,7 @@ function openFGateAnimation(count, modifier){
 		oldX = myBase.gate1.x
 		oldGate = {x:oldX, y :myBase.gate1.y, w:myBase.gate1.w, h:myBase.gate1.h}
 		//push changes and change base
-		changes.push({old:oldGate, new:newGate1, pattern: patternGateL})
+		changes.push({old:oldGate, new:newGate1, pattern: gate1})
 		myBase.gate1.x = myBase.gate1.x - modifier
 
 		//newgate2
@@ -127,7 +123,7 @@ function openFGateAnimation(count, modifier){
 		oldX = myBase.gate2.x
 		oldGate = {x:oldX, y :myBase.gate2.y, w:myBase.gate2.w, h:myBase.gate2.h}
 		//push changes and change base
-		changes.push({old:oldGate, new:newGate2, pattern: patternGateR})
+		changes.push({old:oldGate, new:newGate2, pattern: gate2})
 		myBase.gate2.x = myBase.gate2.x + modifier
 		count = count + modifier	
 		//go for 50 then close
@@ -177,11 +173,10 @@ function draw() {
 	ctx.stroke();
 
 	//friendly base
-	ctx.fillStyle = patternGateL;
-	ctx.fillRect(myBase.gate1.x,myBase.gate1.y,myBase.gate1.w,myBase.gate1.h);
-	ctx.fillStyle = patternGateR;
-	ctx.fillRect(myBase.gate2.x,myBase.gate2.y,myBase.gate2.w,myBase.gate2.h);
-	ctx.fill();
+	//ctx.fillRect(myBase.gate1.x,myBase.gate1.y,myBase.gate1.w,myBase.gate1.h);
+	ctx.drawImage(gate1,myBase.gate1.x,myBase.gate1.y);
+	ctx.drawImage(gate2,myBase.gate2.x,myBase.gate2.y);
+	//ctx.fillRect(myBase.gate2.x,myBase.gate2.y,myBase.gate2.w,myBase.gate2.h);
 
 	ctx.fillStyle = "black";
 	drawFriendlyWall();
