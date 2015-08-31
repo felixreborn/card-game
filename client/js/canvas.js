@@ -9,14 +9,37 @@ myBase.townCenter.next = 1
 myBase.wizardsTower = {}
 myBase.wizardsTower.current = 0
 myBase.wizardsTower.next = 1
-
+elements = []
 
 window.onload = function() {
 	canvas = document.getElementById("canvas");	
-	draw()
+	draw();
 };
 
+
+function elementClicked(event){
+	cw = canvas.width;
+    ch = canvas.height;
+
+    //scale offset for css rescale
+    sx = cw / canvas.offsetWidth;
+	sy = ch / canvas.offsetHeight;
+
+	var x = Math.round(event.pageX * sx),
+	    y = Math.round(event.pageY * sy);
+
+	// Collision detection between click and element
+	elements.forEach(function(element) {
+	    if (y > element.top && y < element.top + element.height 
+	        && x > element.left && x < element.left + element.width) {
+	        console.log(element.name + ' was clicked');
+	    }
+	});
+}
+
 function draw() {
+	canvas.removeEventListener("mouseup", elementClicked);
+	canvas.addEventListener('mouseup', elementClicked);	
 	//set it to full screen
 	ctx = canvas.getContext("2d");
 	canvas.width = 1500;
@@ -26,12 +49,15 @@ function draw() {
 	//ctx.fillRect(X,Y,W,H);
 
 	//barracks
+	elements.push({name: 'eBarracks',  left: 100, top: 50, width: 200, height: 100})
 	ctx.fillRect(100,50,200,100);
 	
 	//town center
+	elements.push({name: 'eTownCenter',  left: 400, top: 50, width: 200, height: 100})
 	ctx.fillRect(400,50,200,100);
 	
 	//wizards tower
+	elements.push({name: 'eWizardsTower',  left: 700, top: 50, width: 200, height: 100})
 	ctx.fillRect(700,50,200,100);
 
 	//base wall
