@@ -11,14 +11,14 @@ myBase.wizardsTower.current = 0
 myBase.wizardsTower.next = 1
 myBase.gate1 = {}
 myBase.gate1.x = 450
-myBase.gate1.y = 585
+myBase.gate1.y = 580
 myBase.gate1.w = 50
-myBase.gate1.h = 30
+myBase.gate1.h = 40
 myBase.gate2 = {}
 myBase.gate2.x = 500
-myBase.gate2.y = 585
+myBase.gate2.y = 580
 myBase.gate2.w = 50
-myBase.gate2.h = 30
+myBase.gate2.h = 40
 //click events
 elements = []
 changes = []
@@ -29,12 +29,17 @@ openFGatePlaying = false
 
 window.onload = function() {
 	canvas = document.getElementById("canvas");
+	wall1 = document.getElementById("wall1");
+	gate1 = document.getElementById("gate1");
+	gate2 = document.getElementById("gate2");
 	canvas.removeEventListener("mouseup", elementClicked);
 	canvas.addEventListener('mouseup', elementClicked);	
 	canvas.width = 1500;
 	canvas.height = 1000;
 	//set it to full screen
 	ctx = canvas.getContext("2d");
+	patternGateL = ctx.createPattern(gate1, 'no-repeat');
+	patternGateR = ctx.createPattern(gate2, 'no-repeat');
 	draw();
 	setInterval(start, 33); // 33 milliseconds = ~ 30 frames per sec
 };
@@ -48,9 +53,14 @@ function start() {
 function redraw(){
 	var i = 0;
 	while (i < changes.length){
+		if (changes[i].pattern != undefined){
+			ctx.fillStyle = changes[i].pattern;
+		}
 		ctx.clearRect(changes[i].old.x, changes[i].old.y, changes[i].old.w, changes[i].old.h);
 		ctx.fillRect(changes[i].new.x, changes[i].new.y, changes[i].new.w, changes[i].new.h);
+		ctx.fill();
 		changes.splice(i, 1);
+		ctx.fillStyle = "black";
 		i++;
 	}
 	var i = 0;
@@ -107,7 +117,7 @@ function openFGateAnimation(count, modifier){
 		oldX = myBase.gate1.x
 		oldGate = {x:oldX, y :myBase.gate1.y, w:myBase.gate1.w, h:myBase.gate1.h}
 		//push changes and change base
-		changes.push({old:oldGate, new:newGate1})
+		changes.push({old:oldGate, new:newGate1, pattern: patternGateL})
 		myBase.gate1.x = myBase.gate1.x - modifier
 
 		//newgate2
@@ -117,7 +127,7 @@ function openFGateAnimation(count, modifier){
 		oldX = myBase.gate2.x
 		oldGate = {x:oldX, y :myBase.gate2.y, w:myBase.gate2.w, h:myBase.gate2.h}
 		//push changes and change base
-		changes.push({old:oldGate, new:newGate2})
+		changes.push({old:oldGate, new:newGate2, pattern: patternGateR})
 		myBase.gate2.x = myBase.gate2.x + modifier
 		count = count + modifier	
 		//go for 50 then close
@@ -131,14 +141,10 @@ function openFGateAnimation(count, modifier){
 
 function drawFriendlyWall(){
 	//base wall
-	ctx.lineWidth=10;
-	ctx.moveTo(0,600);
-	ctx.lineTo(450,600);
-	ctx.stroke();
-
-	ctx.moveTo(550,600);
-	ctx.lineTo(1000,600);
-	ctx.stroke();
+	ctx.globalCompositeOperation = 'destination-over';
+	ctx.drawImage(wall1,0,590);
+	ctx.drawImage(wall1,550,590);
+	ctx.globalCompositeOperation = 'source-over';
 }
 
 function draw() {
@@ -171,10 +177,13 @@ function draw() {
 	ctx.stroke();
 
 	//friendly base
-
+	ctx.fillStyle = patternGateL;
 	ctx.fillRect(myBase.gate1.x,myBase.gate1.y,myBase.gate1.w,myBase.gate1.h);
+	ctx.fillStyle = patternGateR;
 	ctx.fillRect(myBase.gate2.x,myBase.gate2.y,myBase.gate2.w,myBase.gate2.h);
+	ctx.fill();
 
+	ctx.fillStyle = "black";
 	drawFriendlyWall();
 
 	//barracks

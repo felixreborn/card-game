@@ -9,3 +9,9 @@ html, body {
   height: 100%;
   margin: 0px;
 }
+
+#wall1, #gate1, #gate2 {
+	height : 50px;
+	width : 40px;
+	visibility: hidden;
+}
