@@ -22,7 +22,7 @@ myBase.gate2.h = 30
 //click events
 elements = []
 changes = []
-redrawn = false
+functions = []
 
 window.onload = function() {
 	canvas = document.getElementById("canvas");
@@ -43,15 +43,20 @@ function start() {
 }
 
 function redraw(){
-	console.log('redrawing')
-	var i = 0
+	var i = 0;
 	while (i < changes.length){
-		console.log('i have changes')
 		ctx.clearRect(changes[i].old.x, changes[i].old.y, changes[i].old.w, changes[i].old.h);
 		ctx.fillRect(changes[i].new.x, changes[i].new.y, changes[i].new.w, changes[i].new.h);
+		changes.splice(i, 1);
 		i++;
 	}
-	redrawn = true
+	var i = 0;
+	while (i < functions.length){
+		var tmpFunc = new Function(functions[i]);
+		functions.splice(i, 1);
+		tmpFunc();
+		i++;
+	}
 }
 
 function elementClicked(event){
@@ -79,36 +84,54 @@ function elementClicked(event){
 }
 
 function openFGate(){
-	openFGateAnimation(0, 1);
+	openFGateAnimation(1, 1);
 }
 
 function openFGateAnimation(count, modifier){
-	if (!redrawn){
-		openFGateAnimation(count, modifier)
+	if (count == 0){
+		//stop
+		drawFriendlyWall();
 	}else{
-		newGate = {y :myBase.gate1.y, w:myBase.gate1.w, h:myBase.gate1.h}
-		newGate.x = myBase.gate1.x - modifier
-		changes.push({old:myBase.gate1, new:newGate})
+		drawFriendlyWall();
+		//newgate1
+		newGate1 = {y :myBase.gate1.y, w:myBase.gate1.w, h:myBase.gate1.h}
+		newGate1.x = myBase.gate1.x - modifier
+		//oldvalue
+		oldX = myBase.gate1.x
+		oldGate = {x:oldX, y :myBase.gate1.y, w:myBase.gate1.w, h:myBase.gate1.h}
+		//push changes and change base
+		changes.push({old:oldGate, new:newGate1})
 		myBase.gate1.x = myBase.gate1.x - modifier
-		newGate.x = myBase.gate2.x + modifier
-		changes.push({old:myBase.gate2, new:newGate})
+
+		//newgate2
+		newGate2 = {y :myBase.gate2.y, w:myBase.gate2.w, h:myBase.gate2.h}
+		newGate2.x = myBase.gate2.x + modifier
+		//oldvalue
+		oldX = myBase.gate2.x
+		oldGate = {x:oldX, y :myBase.gate1.y, w:myBase.gate1.w, h:myBase.gate1.h}
+		//push changes and change base
+		changes.push({old:oldGate, new:newGate2})
 		myBase.gate2.x = myBase.gate2.x + modifier
+		count = count + modifier	
+		//go for 50 then close
 		if (count == 50){
 			modifier = -1
 		}
-		console.log('redrawn')
-		console.log(redrawn)
-		console.log('counting')
-		console.log(count)
-		redrawn = false
-		count = count + modifier
-		if (count == 0){
-			//stop
-		}else{
-			openFGateAnimation(count, modifier)
-		}
-	}
-	
+		functions.push('openFGateAnimation(' + count + ',' + modifier + ')')
+	}	
+}
+
+
+function drawFriendlyWall(){
+	//base wall
+	ctx.lineWidth=10;
+	ctx.moveTo(0,600);
+	ctx.lineTo(450,600);
+	ctx.stroke();
+
+	ctx.moveTo(550,600);
+	ctx.lineTo(1000,600);
+	ctx.stroke();
 }
 
 function draw() {
@@ -142,18 +165,10 @@ function draw() {
 
 	//friendly base
 
-	//base wall
-	ctx.lineWidth=10;
-	ctx.moveTo(0,600);
-	ctx.lineTo(450,600);
-	ctx.stroke();
-
 	ctx.fillRect(myBase.gate1.x,myBase.gate1.y,myBase.gate1.w,myBase.gate1.h);
 	ctx.fillRect(myBase.gate2.x,myBase.gate2.y,myBase.gate2.w,myBase.gate2.h);
 
-	ctx.moveTo(550,600);
-	ctx.lineTo(1000,600);
-	ctx.stroke();
+	drawFriendlyWall();
 
 	//barracks
 	ctx.fillRect(100,650,200,100);
